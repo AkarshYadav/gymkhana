@@ -6,14 +6,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { formatCurrency } from "@/utils/formatter"
-import { addProduct } from "@/actions/admin_actions/products"
+import { addProduct, updateProduct } from "@/actions/admin_actions/products"
 import { Loader2 } from "lucide-react"
-import { useFormStatus } from "react-dom"
+import { useFormStatus, useFormState } from "react-dom"
+import { Product } from "@prisma/client"
+import Image from "next/image"
+export default function EditingPage({ product }: { product?: Product | null }) {
+    const [error, action] = useFormState(
+        product == null ? addProduct : updateProduct.bind(null, product.id),
+        {}
+    )
+    const [price, setPrice] = useState<number | undefined>(product?.price)
 
-export default function NewProductPage() {
-    const [error, action] = useActionState(addProduct, {})
-    const [price, setPrice] = useState<number>(0)
-    
     const handleSubmit = async (formData: FormData) => {
         try {
             await action(formData)
@@ -27,16 +31,17 @@ export default function NewProductPage() {
             <form action={handleSubmit} className="bg-white mx-20 my-10 p-4 rounded-lg">
                 <div className="space-y-2">
                     <Label htmlFor="name">Product Name</Label>
-                    <Input id="name" type="text" name="name" required />
+                    <Input id="name" type="text" name="name" defaultValue={product?.name} required />
                     {error?.name && <p className="text-red-500">{error.name}</p>}
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="productPrice">Product Price</Label>
-                    <Input 
+                    <Input
                         id="productPrice"
                         type="number"
                         name="productPrice"
                         required
+                        defaultValue={product?.price}
                         value={price}
                         onChange={e => setPrice(Number(e.target.value))}
                     />
@@ -47,18 +52,29 @@ export default function NewProductPage() {
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="description">Product Description</Label>
-                    <Textarea id="description" name="description" required />
+                    <Textarea id="description" name="description" defaultValue={product?.description} required />
                     {error?.description && <p className="text-red-500">{error.description}</p>}
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="image">Product Image</Label>
-                    <Input id="image" type="file" name="image" required />
-                    {error?.image && <p className="text-red-500">{error.image}</p>}
+                    <Label htmlFor="file">File</Label>
+                    <Input type="file" id="file" name="file" required={product == null} />
+                    {product != null && (
+                        <div className="text-muted-foreground">{product.filePath}</div>
+                    )}
+                    {error.file && <div className="text-destructive">{error.file}</div>}
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="file">File</Label>
-                    <Input id="file" type="file" name="file" required />
-                    {error?.file && <p className="text-red-500">{error.file}</p>}
+                    <Label htmlFor="image">Image</Label>
+                    <Input type="file" id="image" name="image" required={product == null} />
+                    {product != null && (
+                        <Image
+                            src={product.imagePath}
+                            height="400"
+                            width="400"
+                            alt="Product Image"
+                        />
+                    )}
+                    {error.image && <div className="text-destructive">{error.image}</div>}
                 </div>
                 <div className="flex justify-start gap-4 mt-4">
                     <SubmitButton />
