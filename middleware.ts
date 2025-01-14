@@ -1,26 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
 
-export async function middleware(req: NextRequest) {
-    if (await isAuthenticated(req) === false) {
-        return NextResponse.json("Unauthorized", {
-            status: 401,
-            headers: {
-                'WWW-Authenticate': 'Basic realm="Secure Area"'
-            }
-        });
-    }
-}
-
-async function isAuthenticated(req: NextRequest) {
-    const authHeader = req.headers.get("autherization")|| req.headers.get("Authorization");
-    if (authHeader == null) return false;
-    const [username, password] = Buffer.from(authHeader.split(" ")[1], "base64").toString()
-    .split(":")
-    
-return username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD;
-
-}
+export default clerkMiddleware();
 
 export const config = {
-    matcher: ['/admin/:path*'],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 };

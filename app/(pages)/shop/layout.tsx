@@ -8,7 +8,7 @@ export default function shopLayout({children}:{
         <div>
             <Header/>
             <main>
-                <Container>
+                <Container className="py-10">
                     {children}
                 </Container>
             </main>

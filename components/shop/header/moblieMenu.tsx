@@ -1,10 +1,21 @@
-import React from 'react'
+"use client"
+
+import React, { useState } from 'react'
 import { AlignLeft } from 'lucide-react'
+import Sidebar from './Sidebar'
+
 function MoblieMenu() {
+  const[isSidebarOpen, setIsSidebarOpen] = useState(false)
   return (
-    <div>
+    <>
       <AlignLeft size={24} className='hover:cursor-pointer md:hidden' />
-    </div>
+      <div className='md:hidden'>
+        <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        />
+      </div>
+    </>
   )
 }
 

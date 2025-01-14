@@ -1,7 +1,9 @@
+import HomeBanner from "@/components/shop/hero/HomeBanner"
+
 export default function Shop() {
     return(
         <div>
-            <h1>Shop</h1>
+            <HomeBanner></HomeBanner>
         </div>
     )
 }
