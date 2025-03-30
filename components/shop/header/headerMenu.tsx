@@ -15,13 +15,14 @@ const HeaderMenu = () => {
     return (
         <>
 
-            <div className={cn("hidden md:flex items-center space-x-4", font.className)}>
+            <div className={cn("hidden md:flex items-center space-x-4 text-gray-600 dark:text-gray-300", font.className)}>
                 <NavLink href="/shop" >Home</NavLink>
-                <NavLink href="/shop/mens" >Men</NavLink>
-                <NavLink href="/shop/womens" >Women</NavLink>
-                <NavLink href="/shop/features" >Features</NavLink>
+                <NavLink href="/shop/men" >Men</NavLink>
+                <NavLink href="/shop/women" >Women</NavLink>
+                <NavLink href="/shop/featured" >Featured</NavLink>
+                <NavLink href="/shop/accessories" >Accessories</NavLink>
             </div>
-          
+
         </>
     )
 }
@@ -29,7 +30,7 @@ const HeaderMenu = () => {
 export default HeaderMenu
 
 
- function NavLink(props: Omit<ComponentProps<typeof Link>, "className">) {
+function NavLink(props: Omit<ComponentProps<typeof Link>, "className">) {
     const pathname = usePathname()
     return (
         <Link

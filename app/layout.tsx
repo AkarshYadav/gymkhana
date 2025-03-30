@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google"
 import "./globals.css";
 import { ClerkProvider} from '@clerk/nextjs'
+import { Toaster } from "react-hot-toast";
 
+const inter = Inter({ subsets: ["latin"] })
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -27,10 +30,20 @@ export default function RootLayout({
     <ClerkProvider>
     <html lang="en">
       <body
-        className={`min-h-screen ${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`min-h-screen ${geistSans.variable} ${geistMono.variable} antialiased ${inter.className}`}
       >
         {children}
       </body>
+      <Toaster 
+      position ="bottem-right"
+      toastOptions={
+      {
+        style : {
+          backgroundColor: '#0070f3',
+          color: '#ffffff',
+        }
+      }
+      }/>
     </html>
     </ClerkProvider>
   );

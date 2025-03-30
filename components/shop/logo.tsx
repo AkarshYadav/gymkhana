@@ -13,14 +13,14 @@ export const Logo = () => {
             <div className="flex  items-center gap-x-2 hover:opacity-75 transition">
                 <div className=" p-1 lg:mr-0  shrink-0 ">
                     <Image
-                        src="/gymkhana.png"
+                        src="/gymkhana1.png"
                         alt="attendease logo"
                         height="40"
                         width="40" />
                 </div>
                 <div className={cn(" lg:flex flex-col items-center justify-center ",
                     font.className
-                )}><p className="text-base md:text-lg font-medium">
+                )}><p className="text-base md:text-lg font-medium text-gray-600 dark:text-gray-300">
                         Gymkhana</p>
                 </div>
             </div>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Actions from "./actions";
 import { Logo } from "../logo";
-
+import Container from "@/components/shop/Container";
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -26,6 +26,7 @@ export const Navbar = () => {
         isScrolled ? "bg-black text-white shadow-md" : "bg-transparent text-black"
       }`}
     >
+      
       <Logo />
       <Actions />
     </nav>

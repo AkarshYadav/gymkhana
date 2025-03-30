@@ -13,7 +13,7 @@ export const Logo = () => {
             <div className="flex  items-center gap-x-2 hover:opacity-75 transition">
                 <div className=" p-1 lg:mr-0 mr-12 shrink-0 ">
                     <Image
-                        src="/pinsearch.svg"
+                        src="/gymkhana1.png"
                         alt="attendease logo"
                         height="38"
                         width="38" />
