@@ -7,11 +7,14 @@ import Link from "next/link"
 import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import Container from "@/components/shop/Container";
-interface ClubPageProps {
+
+// Fix 1: Update interface to use correct Next.js App Router typing
+type ClubPageProps = {
     params: {
-        committeeId: string
-        club: string
-    }
+        committeeId: string;
+        club: string;
+    };
+    searchParams?: Record<string, string | string[] | undefined>;
 }
 
 async function getClubData(clubId: string) {
@@ -110,6 +113,7 @@ function MembersSkeleton() {
     )
 }
 
+// Fix 2: Use the updated type definition
 export default async function ClubPage({ params }: ClubPageProps) {
     const club = await getClubData(params.club)
 
@@ -259,4 +263,3 @@ export default async function ClubPage({ params }: ClubPageProps) {
         </div>
     )
 }
-
