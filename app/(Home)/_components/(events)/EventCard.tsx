@@ -1,7 +1,15 @@
 import React from 'react';
 import Image from 'next/image';
+interface Event {
+    _id: string;
+    name: string;
+    description: string;
+    images?: { url: string }[];
+    eventDate: string;
+    eventTime: string;
+}
 
-const EventCard = ({ event }) => {
+const EventCard: React.FC<{ event: Event }> = ({ event }) => {
     return (
         <div className="flex flex-col justify-center items-center p-6 rounded-2xl mx-auto my-6 transition-transform hover:scale-110 border-4 w-[15rem] md:w-[17rem] xl:w-[18.75rem] bg-white/10 border-white/50 hover:border-white/80">
             <div className="w-[90%] flex justify-center items-center">

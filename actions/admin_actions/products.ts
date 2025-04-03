@@ -53,17 +53,21 @@ export async function addProduct(prevState: unknown, formData: FormData) {
         })
 
         redirect("/admin/products")
-    } catch (error) {
-        console.error('Server action error:', error)
-
-        if (error.digest && error.digest.startsWith('NEXT_REDIRECT')) {
-            console.error('Redirection error details:', error.digest)
+    }catch (error) {
+        console.error('Server action error:', error);
+    
+        // ✅ Ensure error is an instance of Error and contains the 'digest' property
+        if (error instanceof Error && "digest" in error && typeof error.digest === "string") {
+            if (error.digest.startsWith('NEXT_REDIRECT')) {
+                console.error('Redirection error details:', error.digest);
+            }
         }
-
+    
         return {
             error: "Failed to create product. Please try again."
-        }
+        };
     }
+    
 }
 
 const editSchema = addSchema.extend({
@@ -110,16 +114,20 @@ export async function updateProduct(id:string,prevState: unknown, formData: Form
 
         redirect("/admin/products")
     } catch (error) {
-        console.error('Server action error:', error)
-
-        if (error.digest && error.digest.startsWith('NEXT_REDIRECT')) {
-            console.error('Redirection error details:', error.digest)
+        console.error('Server action error:', error);
+    
+        // ✅ Ensure error is an instance of Error and contains the 'digest' property
+        if (error instanceof Error && "digest" in error && typeof error.digest === "string") {
+            if (error.digest.startsWith('NEXT_REDIRECT')) {
+                console.error('Redirection error details:', error.digest);
+            }
         }
-
+    
         return {
             error: "Failed to create product. Please try again."
-        }
+        };
     }
+    
 }
 
 export  async function deleteProduct(id: string){

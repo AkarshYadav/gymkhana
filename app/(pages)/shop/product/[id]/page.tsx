@@ -5,7 +5,7 @@ import ProductImages from "./_components/ProductImages";
 import ProductInfo from "./_components/ProductInfo";
 
 
-export default async function SingleProductPage({ params }: { params: { id: string } }) {
+export default async function SingleProductPage({ params }: { params: Promise<{ id: string }> }) {
     const product = await getProductById(params.id);
 
     if (!product) return notFound();

@@ -9,10 +9,20 @@ import Link from "next/link";
 const EVENTS_QUERY_URL =
     "https://aiqtrfyk.api.sanity.io/v2025-01-26/data/query/production?query=*%5B_type+%3D%3D+%22event%22%5D+%7C+order%28_createdAt+desc%29+%5B0..2%5D+%7B%0A++_id%2C%0A++name%2C%0A++description%2C%0A++images%5B%5D+%7B+%22url%22%3A+asset-%3Eurl+%7D%2C%0A++eventDate%2C%0A++eventTime%2C%0A++location%2C%0A++organizer%2C%0A++registrationLink%0A%7D%0A%0A";
 
+interface Event {
+    _id: string;
+    name: string;
+    description: string;
+    images?: { url: string }[];
+    eventDate: string;
+    eventTime: string;
+}
+
 export default function Events() {
-    const [latestEvents, setLatestEvents] = useState([]);
+    const [latestEvents, setLatestEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
+
 
     useEffect(() => {
         async function fetchEvents() {

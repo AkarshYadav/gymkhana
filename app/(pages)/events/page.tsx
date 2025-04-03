@@ -5,26 +5,56 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { Calendar, Clock, MapPin, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent} from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import EventCard from "./_components/enhanced-event-card"
 import { format, parseISO } from "date-fns"
 
-const EVENTS_QUERY_URL =
+// Define the Event type
+type Event = {
+  _id: string
+  name: string
+  description: string
+  images: { url: string }[]
+  eventDate: string
+  eventTime: string
+  location: string
+  organizer: string
+  registrationLink: string
+  formattedDate?: string
+}
+
+// Function to fetch all events directly from Sanity
+async function getAllEvents(): Promise<Event[]> {
+  const EVENTS_QUERY_URL =
     "https://aiqtrfyk.api.sanity.io/v2025-01-26/data/query/production?query=*%5B_type+%3D%3D+%22event%22%5D+%7C+order%28eventDate+desc%29+%7B%0A++_id%2C%0A++name%2C%0A++description%2C%0A++images%5B%5D+%7B+%22url%22%3A+asset-%3Eurl+%7D%2C%0A++eventDate%2C%0A++eventTime%2C%0A++location%2C%0A++organizer%2C%0A++registrationLink%0A%7D%0A%0A"
 
+  try {
+    const response = await fetch(EVENTS_QUERY_URL)
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch events: ${response.status}`)
+    }
+    
+    const data = await response.json()
+    return data.result || []
+  } catch (error) {
+    console.error("Error fetching events:", error)
+    return []
+  }
+}
+
 export default function EventsPage() {
-    const [events, setEvents] = useState([])
+    const [events, setEvents] = useState<Event[]>([])
     const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
-    const [featuredEvent, setFeaturedEvent] = useState(null)
+    const [error, setError] = useState<string | null>(null)
+    const [featuredEvent, setFeaturedEvent] = useState<Event | null>(null)
 
     useEffect(() => {
         async function fetchEvents() {
+            setLoading(true)
             try {
-                const response = await fetch(EVENTS_QUERY_URL)
-                const data = await response.json()
-                const allEvents = data.result || []
+                const allEvents = await getAllEvents()
 
                 // Set the first event as featured if events exist
                 if (allEvents.length > 0) {
@@ -42,7 +72,7 @@ export default function EventsPage() {
         fetchEvents()
     }, [])
 
-    const formatDate = (dateString) => {
+    const formatDate = (dateString?: string) => {
         try {
             if (!dateString) return "TBA"
             return format(parseISO(dateString), "MMMM d, yyyy")
@@ -197,15 +227,6 @@ export default function EventsPage() {
                     </div>
 
                     <Tabs defaultValue="all" className="w-full">
-                        {/* <div className="flex justify-center mb-8">
-                            <TabsList className="bg-white dark:bg-gray-800 shadow-md">
-                                <TabsTrigger value="all">All Events</TabsTrigger>
-                                <TabsTrigger value="sports">Sports</TabsTrigger>
-                                <TabsTrigger value="cultural">Cultural</TabsTrigger>
-                                <TabsTrigger value="technical">Technical</TabsTrigger>
-                            </TabsList>
-                        </div> */}
-
                         <TabsContent value="all">
                             {loading ? (
                                 <div className="flex justify-center items-center h-64">
@@ -237,38 +258,9 @@ export default function EventsPage() {
                                 </motion.div>
                             )}
                         </TabsContent>
-
-                        {/* Other tabs remain the same */}
                     </Tabs>
                 </div>
             </section>
-
-            {/* Call to Action */}
-            {/* <section className="py-16 bg-gradient-to-r from-purple-900 via-violet-800 to-indigo-900 text-white">
-                <div className="container mx-auto px-4 text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.7 }}
-                        viewport={{ once: true }}
-                        className="max-w-3xl mx-auto space-y-6"
-                    >
-                        <h2 className="text-3xl md:text-4xl font-bold">Ready to Participate?</h2>
-                        <p className="text-lg text-white/80">
-                            Join our vibrant community and be part of exciting events that showcase talent, sportsmanship, and
-                            creativity.
-                        </p>
-                        <div className="pt-6">
-                            <Button
-                                size="lg"
-                                className="bg-orange-500 hover:bg-orange-600 text-white transform hover:scale-105 transition-transform"
-                            >
-                                Register Now
-                            </Button>
-                        </div>
-                    </motion.div>
-                </div>
-            </section> */}
         </div>
     )
 }

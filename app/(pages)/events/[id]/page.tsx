@@ -10,24 +10,58 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { format, parseISO } from "date-fns"
 
+// Define the Event type
+type Event = {
+  _id: string
+  name: string
+  description: string
+  images: { url: string }[]
+  eventDate: string
+  eventTime: string
+  location: string
+  organizer: string
+  registrationLink: string
+}
+
+// Function to fetch event by ID directly from Sanity
+async function getEventById(id: string): Promise<Event | null> {
+  const EVENTS_QUERY_URL =
+    "https://aiqtrfyk.api.sanity.io/v2025-01-26/data/query/production?query=*%5B_type+%3D%3D+%22event%22%5D+%7B%0A++_id%2C%0A++name%2C%0A++description%2C%0A++images%5B%5D+%7B+%22url%22%3A+asset-%3Eurl+%7D%2C%0A++eventDate%2C%0A++eventTime%2C%0A++location%2C%0A++organizer%2C%0A++registrationLink%0A%7D%0A%0A"
+
+  try {
+    const response = await fetch(EVENTS_QUERY_URL)
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch events: ${response.status}`)
+    }
+
+    const data = await response.json()
+    const events = data.result || []
+    return events.find((event: Event) => event._id === id) || null
+  } catch (error) {
+    console.error("Error fetching event:", error)
+    return null
+  }
+}
+
 export default function EventDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const { id } = params
+  const { id } = params as { id: string }
 
-  const [event, setEvent] = useState(null)
+  const [event, setEvent] = useState<Event | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchEventDetails() {
+      setLoading(true)
       try {
-        const response = await fetch(`/api/events/${id}`)
-        if (!response.ok) {
-          throw new Error("Failed to fetch event details")
+        const eventData = await getEventById(id)
+        if (!eventData) {
+          throw new Error("Event not found")
         }
-        const data = await response.json()
-        setEvent(data)
+        setEvent(eventData)
       } catch (err) {
         setError("Failed to load event details")
         console.error(err)
@@ -41,7 +75,7 @@ export default function EventDetailPage() {
     }
   }, [id])
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString?: string) => {
     try {
       if (!dateString) return "TBA"
       return format(parseISO(dateString), "MMMM d, yyyy")
@@ -54,8 +88,8 @@ export default function EventDetailPage() {
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: event.name,
-        text: `Check out this event: ${event.name}`,
+        title: event?.name || "Event",
+        text: `Check out this event: ${event?.name}`,
         url: window.location.href
       })
     } else {
@@ -78,8 +112,8 @@ export default function EventDetailPage() {
       <div className="container mx-auto px-4 py-16 text-center bg-gray-50 dark:bg-gray-900 min-h-screen">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Error Loading Event</h2>
         <p className="text-muted-foreground mb-8">{error || "Event not found"}</p>
-        <Button 
-          onClick={() => router.push("/events")} 
+        <Button
+          onClick={() => router.push("/events")}
           className="bg-orange-500 hover:bg-orange-600 text-white"
         >
           Back to Events
@@ -126,9 +160,9 @@ export default function EventDetailPage() {
       <section className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-8 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              animate={{ opacity: 1, y: 0 }} 
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
               <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">About This Event</h2>
@@ -146,8 +180,8 @@ export default function EventDetailPage() {
                 <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">Event Gallery</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {event.images.slice(1).map((image, index) => (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className="relative aspect-square rounded-lg overflow-hidden shadow-md"
                     >
                       <Image
@@ -192,8 +226,8 @@ export default function EventDetailPage() {
               <Separator className="my-6" />
 
               {event.registrationLink ? (
-                <Button 
-                  asChild 
+                <Button
+                  asChild
                   className="w-full bg-orange-500 hover:bg-orange-600 text-white mb-4 transform hover:scale-105 transition-transform"
                 >
                   <a href={event.registrationLink} target="_blank" rel="noopener noreferrer">
@@ -206,9 +240,9 @@ export default function EventDetailPage() {
                 </Button>
               )}
 
-              <Button 
-                variant="outline" 
-                className="w-full flex items-center gap-2" 
+              <Button
+                variant="outline"
+                className="w-full flex items-center gap-2"
                 onClick={handleShare}
               >
                 <Share2 className="h-4 w-4" />

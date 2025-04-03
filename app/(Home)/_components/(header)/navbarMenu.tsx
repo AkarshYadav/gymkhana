@@ -17,9 +17,15 @@ const font = Poppins({
 
 const queryUrl = "https://aiqtrfyk.api.sanity.io/v2025-01-26/data/query/production?query=*%5B_type+%3D%3D+%27committee%27%5D+%7C+order%28_createdAt+asc%29+%7B+_id%2C+name+%7D";
 
+interface Committee {
+  _id: string;
+  name: string;
+}
+
 const NavbarMenu = () => {
-  const [committees, setCommittees] = useState([]);
-  
+  const [committees, setCommittees] = useState<Committee[]>([]);
+
+
   useEffect(() => {
     const fetchCommittees = async () => {
       try {
@@ -39,7 +45,7 @@ const NavbarMenu = () => {
       <NavLink href="/aboutus">AboutUs</NavLink>
       <NavLink href="/events">Events</NavLink>
 
-      
+
       {/* Dropdown for Committees */}
       <DropdownMenu>
         <DropdownMenuTrigger className="flex items-center gap-1 p-4 hover:bg-secondary hover:text-secondary-foreground focus-visible:bg-secondary text-muted-foreground font-medium">
@@ -54,8 +60,8 @@ const NavbarMenu = () => {
           >
             {committees.map(committee => (
               <DropdownMenuItem key={committee._id} asChild>
-                <Link 
-                  href={`/committees/${committee._id}`} 
+                <Link
+                  href={`/committees/${committee._id}`}
                   className="block px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 hover:cursor-pointer"
                 >
                   {committee.name}

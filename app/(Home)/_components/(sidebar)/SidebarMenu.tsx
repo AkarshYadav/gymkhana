@@ -17,8 +17,13 @@ const font = Poppins({
 
 const queryUrl = "https://aiqtrfyk.api.sanity.io/v2025-01-26/data/query/production?query=*%5B_type+%3D%3D+%27committee%27%5D+%7C+order%28_createdAt+asc%29+%7B+_id%2C+name+%7D";
 
+interface Committee {
+    _id: string;
+    name: string;
+}
+
 const SiderMenu = () => {
-    const [committees, setCommittees] = useState([]);
+    const [committees, setCommittees] = useState<Committee[]>([]);
 
     useEffect(() => {
         const fetchCommittees = async () => {

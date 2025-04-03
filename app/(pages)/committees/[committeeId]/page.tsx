@@ -6,9 +6,9 @@ import { Skeleton } from "@/components/ui/skeleton"
 import Image from "next/image"
 import Container from "@/components/shop/Container";
 interface CommitteePageProps {
-  params: {
+  params: Promise<{
     committeeId: string
-  }
+  }>
 }
 
 async function getCommitteeData(committeeId: string) {

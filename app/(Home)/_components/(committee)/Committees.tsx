@@ -7,11 +7,15 @@ import Container from "@/components/shop/Container";
 import Link from "next/link";
 
 const queryUrl = "https://aiqtrfyk.api.sanity.io/v2025-01-26/data/query/production?query=*%5B_type+%3D%3D+%27committee%27%5D+%7C+order%28_createdAt+asc%29+%7B+_id%2C+name%2C+%22imageUrl%22%3A+image.asset-%3Eurl+%7D";
-
+type Committee = {
+  _id: string;
+  name: string;
+  imageUrl: string;
+};
 export default function Committees() {
-  const [committees, setCommittees] = useState([]);
+  const [committees, setCommittees] = useState<Committee[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCommittees = async () => {
@@ -20,13 +24,14 @@ export default function Committees() {
         const result = await response.json();
         setCommittees(result.result || []);
       } catch (err) {
-        setError("Failed to load committees");
+        setError("Failed to load committees"); // ✅ No more type error
       } finally {
         setLoading(false);
       }
     };
     fetchCommittees();
   }, []);
+
 
   return (
     <section className="py-24  bg-gradient-to-b from-white to-blue-50 dark:from-gray-900 dark:to-gray-800 ">

@@ -9,51 +9,57 @@ import { Skeleton } from "@/components/ui/skeleton"
 import Container from "@/components/shop/Container";
 
 // Fix 1: Update interface to use correct Next.js App Router typing
-type ClubPageProps = {
-    params: {
-        committeeId: string;
-        club: string;
-    };
-    searchParams?: Record<string, string | string[] | undefined>;
+interface ClubPageProps {
+    params: Promise<{ committeeId: string; club: string }>;
 }
+
 
 async function getClubData(clubId: string) {
     const query = `*[_type == 'club' && _id == '${clubId}']{
-    _id,
-    name,
-    description,
-    "imageUrl": image.asset->url,
-    "committee": committee->{
-      _id,
-      name
-    },
-    "secretary": secretary->{
-      name,
-      email,
-      "imageUrl": image.asset->url,
-      role
-    },
-    "members": members[]->{
-      _id,
-      name,
-      email,
-      "imageUrl": image.asset->url,
-      role,
-      "clubs": clubs[]->name
-    }
-  }[0]`
+        _id,
+        name,
+        description,
+        "imageUrl": image.asset->url,
+        "committee": committee->{
+            _id,
+            name
+        },
+        "secretary": secretary->{
+            name,
+            email,
+            "imageUrl": image.asset->url,
+            role
+        },
+        "members": members[]->{
+            _id,
+            name,
+            email,
+            "imageUrl": image.asset->url,
+            role,
+            "clubs": clubs[]->name
+        }
+    }[0]`
 
     const url = `https://aiqtrfyk.api.sanity.io/v2025-01-26/data/query/production?query=${encodeURIComponent(query)}`
 
     try {
         const response = await fetch(url, { next: { revalidate: 60 } })
+
+        if (!response.ok) {
+            console.error("Failed to fetch club data. Status:", response.status)
+            return null
+        }
+
         const data = await response.json()
-        return data.result
+
+        // Ensure we return null if the club is not found
+        return data.result || null
     } catch (error) {
         console.error("Error fetching club data:", error)
         return null
     }
 }
+
 
 function getThemeColors(committeeName: string) {
     switch (committeeName.toLowerCase()) {
@@ -115,6 +121,7 @@ function MembersSkeleton() {
 
 // Fix 2: Use the updated type definition
 export default async function ClubPage({ params }: ClubPageProps) {
+
     const club = await getClubData(params.club)
 
     if (!club) {
